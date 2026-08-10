@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fady — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0e0a;
+  --bg-card: #111814;
+  --text: #c8d6c5;
+  --text-dim: #6a7a6a;
+  --accent: #4a9e6e;
+  --accent-glow: rgba(74, 158, 110, 0.15);
+  --amber: #c4a33a;
+  --border: #2a352a;
+  --grid: rgba(74, 158, 110, 0.03);
+}
+
+html { font-size: 16px; }
+
+body {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Grid texture */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* Layout */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+section {
+  padding: 4rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+section:last-child { border-bottom: none; }
+
+/* Hero */
+.hero {
+  min-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.hero h1 {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.hero .subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
+  color: var(--text-dim);
+  max-width: 60ch;
+}
+
+/* Status indicator */
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-card);
+  font-size: 0.85rem;
+  color: var(--accent);
+  position: relative;
+  overflow: hidden;
+}
+
+.status-indicator::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(74,158,110,0.06), transparent);
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { transform: translateX(-100%); }
+  50% { transform: translateX(100%); }
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: inline-block;
+  position: relative;
+}
+
+.status-dot::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  opacity: 0.3;
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.3; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+.status-text {
+  position: relative;
+  z-index: 1;
+}
+
+.status-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  background: var(--accent);
+  vertical-align: bottom;
+  animation: blink 1.2s step-end infinite;
+  margin-left: 0.25rem;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Sections */
+section h2 {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* About */
+.about p {
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+
+.about p:last-child { margin-bottom: 0; }
+
+/* Stats */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.stat {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  text-align: center;
+  border-radius: 6px;
+  transition: border-color 0.3s;
+}
+
+.stat:hover { border-color: var(--accent); }
+
+.stat .number {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.stat .label {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+/* Cards */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.5rem;
+  transition: transform 0.2s, border-color 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
+
+.card h3 {
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.card p, .card li {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  margin-bottom: 0.4rem;
+}
+
+.card p:last-child, .card li:last-child { margin-bottom: 0; }
+
+.card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.card ul li::before {
+  content: '>';
+  color: var(--accent);
+  margin-right: 0.5rem;
+}
+
+/* Footer */
+.footer {
+  padding: 3rem 0;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.footer p {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  max-width: 60ch;
+  margin: 0 auto;
+  line-height: 1.8;
+}
+
+.footer .proof {
+  color: var(--amber);
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .container { padding: 0 1rem; }
+  section { padding: 2.5rem 0; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Hero -->
+  <section class="hero">
+    <h1>Fady</h1>
+    <p class="subtitle">Cybersecurity student · Red-team focused · Cross-disciplinary builder</p>
+    <div class="status-indicator">
+      <span class="status-dot"></span>
+      <span class="status-text" id="statusText">status: online</span>
+      <span class="status-cursor"></span>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about">
+    <h2>01 — Identity</h2>
+    <div class="about">
+      <p>Currently interning at a security company under a mentor, doing formal penetration testing report work. Building toward red team roles with OSCP-level proficiency.</p>
+      <p>Cross-disciplinary background: game development, backend APIs, Discord bots, a personal AI project, embedded/IoT hardware.</p>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section id="stats">
+    <h2>02 — Stats</h2>
+    <div class="stats">
+      <div class="stat"><span class="number">30</span><span class="label">boxes rooted</span></div>
+      <div class="stat"><span class="number">4</span><span class="label">HTB machines</span></div>
+      <div class="stat"><span class="number">26</span><span class="label">THM rooms</span></div>
+      <div class="stat"><span class="number">1</span><span class="label">formal report</span></div>
+    </div>
+  </section>
+
+  <!-- Exploit Chains -->
+  <section id="exploits">
+    <h2>03 — Exploit Chains & CTF Work</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>HTB — Nexus (Linux, Easy)</h3>
+        <p>vhost enumeration → Gitea repo recon (leaked creds in git history) → Krayin CRM CVE-2026-38526 TinyMCE RCE → www-data shell → SSH as jones via credential reuse → root via git mktree/commit-tree path traversal, exploiting an unsanitized os.path.join() in a root-run systemd timer script. Git blocks / and .. at the porcelain layer, so the traversal needed 5 levels of .. built through nested tree-object construction.</p>
+      </div>
+      <div class="card">
+        <h3>HTB — Orion (Linux)</h3>
+        <p>CraftCMS CVE-2025-32432 RCE → credential reuse → internal Telnet CVE → privesc to root. The only box documented to client-deliverable report standard.</p>
+      </div>
+      <div class="card">
+        <h3>THM — Athena (Linux)</h3>
+        <p>Command injection via %0a bypass → pspy64 cron enumeration → privesc via LKM rootkit triggered by kill -57 to a hidden syscall handler.</p>
+      </div>
+      <div class="card">
+        <h3>THM — Valley (Linux)</h3>
+        <p>pcapng credential extraction → UPX binary unpacking → privesc via Python library hijack in cron.</p>
+      </div>
+      <div class="card">
+        <h3>THM — madness (Linux)</h3>
+        <p>Magic-byte forensics on a mislabeled file → steghide extraction → privesc via SUID screen 4.5.0 CVE.</p>
+      </div>
+      <div class="card">
+        <h3>21 more THM rooms</h3>
+        <p>Ghostcat (CVE-2020-1938), Hydra SSH brute-forcing, IDOR/XSS/LFI chains, cookie forgery + /etc/hosts poisoning, Tomcat WAR deployment, directory-vs-file sudo permission abuse. Named rooms include Brooklyn Nine Nine, Library, Ignite, Thompson, tomghost, Overpass, Dreaming, and LAFB 2026 series rooms.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- What I've Built -->
+  <section id="built">
+    <h2>04 — What I've Built</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>ornith_cli</h3>
+        <p>A custom Ollama-based agentic coding harness running on a locally hosted model (ornith:9b, Qwen3.5-9B hybrid), with a two-role orchestrator (ornith_cli_overseer.py) that splits large development goals into sequenced sub-prompts handled by separate Overseer and Agent roles. A tkinter GUI variant is designed and pending merge. Stack: Python, Ollama, Qwen3.5-9B hybrid, tkinter.</p>
+      </div>
+      <div class="card">
+        <h3>Local inference hardware evaluation</h3>
+        <p>Benchmarked a larger 27B-class model (Qwen3.6-27B) at IQ3 quantization across two consumer GPUs (GTX 1650 Ti laptop, GTX 1650 desktop), identified RAM bandwidth as the hard bottleneck (~1.1 tok/s), and made the call to stay on the smaller daily-driver model rather than chase a size the hardware couldn't serve — then correctly scoped the next upgrade around VRAM (8GB+), not RAM. Stack: llama.cpp, quantization, GPU benchmarking.</p>
+      </div>
+      <div class="card">
+        <h3>ESP32 environmental monitor</h3>
+        <p>Temperature and humidity monitor built on an ESP32-WROOM, reading from an AM2302/DHT22 sensor and displaying live data on an I2C SSD1306 OLED (address 0x3C). Built end-to-end as a gift for a mentor, with a custom enclosure planned. Stack: ESP32, I2C, DHT22, SSD1306.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Infra & Systems -->
+  <section id="infra">
+    <h2>05 — Infra & Systems</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>Arch Linux, from scratch, twice</h3>
+        <p>First on VirtualBox to work out the process, then a full bare-metal install on a Dell Inspiron 3558 replacing Windows 10, running KDE Plasma via archinstall. Debugged UUID precision issues in bootloader config, disabled Secure Boot for USB install, cleaned up NVRAM boot entries left behind from cloned VMs.</p>
+      </div>
+      <div class="card">
+        <h3>Enumeration & recon discipline</h3>
+        <p>Consistent methodology across boxes: fingerprint the server stack before touching a payload. Reinforced repeatedly across TryHackMe's speed-focused rooms, carried into every real engagement since.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final Year Project -->
+  <section id="project">
+    <h2>06 — Final-Year Project (in progress)</h2>
+    <div class="card">
+      <h3>Linux process monitor & threat scorer</h3>
+      <p>Combines SHA-256 hash checks against MalwareBazaar, VirusTotal API lookups, and eBPF-based kernel behavioral monitoring via BCC/libbpf, feeding into a weighted threat-scoring engine with optional Isolation Forest anomaly detection. Process data pulled by polling /proc with psutil, ELF features extracted with lief, presented through a CustomTkinter dashboard, packaged with PyInstaller. Deliberately scoped to Linux only, and deliberately avoids LLM-based runtime inference — at detection time, latency and resource cost matter more than marginal accuracy gain.</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>This website was generated by <span class="proof">ornith:9b</span>, running through an agentic coding harness — not hand-coded or templated. The same person who built this site also built the AI harness capable of building it. This page is a demonstration artifact for that harness, not just a portfolio.</p>
+  </footer>
+
+</div>
+
+<script>
+const statuses = ['online', 'scanning', 'idle'];
+let idx = 0;
+
+setInterval(() => {
+  idx = (idx + 1) % statuses.length;
+  const el = document.getElementById('statusText');
+  el.style.opacity = '0';
+  setTimeout(() => {
+    el.textContent = 'status: ' + statuses[idx];
+    el.style.opacity = '1';
+  }, 150);
+}, 3000);
+</script>
+
+</body>
+</html>
