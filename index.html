@@ -7,289 +7,82 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --bg: #0a0e0a;
-  --bg-card: #111814;
-  --text: #c8d6c5;
-  --text-dim: #6a7a6a;
-  --accent: #4a9e6e;
-  --accent-glow: rgba(74, 158, 110, 0.15);
-  --amber: #c4a33a;
-  --border: #2a352a;
-  --grid: rgba(74, 158, 110, 0.03);
-}
-
-html { font-size: 16px; }
-
-body {
-  font-family: 'JetBrains Mono', monospace;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.7;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* Grid texture */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(var(--grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-  background-size: 60px 60px;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-
-/* Layout */
-.container {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 0 2rem;
-  position: relative;
-  z-index: 1;
-}
-
-section {
-  padding: 4rem 0;
-  border-bottom: 1px solid var(--border);
-}
-
-section:last-child { border-bottom: none; }
-
-/* Hero */
-.hero {
-  min-height: 85vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-}
-
-.hero h1 {
-  font-size: clamp(2.5rem, 6vw, 4.5rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--text);
-  margin-bottom: 1rem;
-}
-
-.hero .subtitle {
-  font-size: clamp(1rem, 2.5vw, 1.3rem);
-  color: var(--text-dim);
-  max-width: 60ch;
-}
-
-/* Status indicator */
-.status-indicator {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-top: 2rem;
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background: var(--bg-card);
-  font-size: 0.85rem;
-  color: var(--accent);
-  position: relative;
-  overflow: hidden;
-}
-
-.status-indicator::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(74,158,110,0.06), transparent);
-  animation: shimmer 3s ease-in-out infinite;
-}
-
-@keyframes shimmer {
-  0%, 100% { transform: translateX(-100%); }
-  50% { transform: translateX(100%); }
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--accent);
-  display: inline-block;
-  position: relative;
-}
-
-.status-dot::after {
-  content: '';
-  position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  border: 1px solid var(--accent);
-  opacity: 0.3;
-  animation: pulse-ring 2s ease-out infinite;
-}
-
-@keyframes pulse-ring {
-  0% { transform: scale(1); opacity: 0.3; }
-  100% { transform: scale(2.5); opacity: 0; }
-}
-
-.status-text {
-  position: relative;
-  z-index: 1;
-}
-
-.status-cursor {
-  display: inline-block;
-  width: 8px;
-  height: 14px;
-  background: var(--accent);
-  vertical-align: bottom;
-  animation: blink 1.2s step-end infinite;
-  margin-left: 0.25rem;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-/* Sections */
-section h2 {
-  font-size: clamp(1.4rem, 3vw, 2rem);
-  font-weight: 600;
-  color: var(--accent);
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border);
-}
-
-/* About */
-.about p {
-  margin-bottom: 0.75rem;
-  color: var(--text);
-}
-
-.about p:last-child { margin-bottom: 0; }
-
-/* Stats */
-.stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1.5rem;
-}
-
-.stat {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  padding: 1.5rem;
-  text-align: center;
-  border-radius: 6px;
-  transition: border-color 0.3s;
-}
-
-.stat:hover { border-color: var(--accent); }
-
-.stat .number {
-  display: block;
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--accent);
-  line-height: 1;
-  margin-bottom: 0.25rem;
-}
-
-.stat .label {
-  font-size: 0.85rem;
-  color: var(--text-dim);
-}
-
-/* Cards */
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 1.5rem;
-  transition: transform 0.2s, border-color 0.3s;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  border-color: var(--accent);
-}
-
-.card h3 {
-  font-weight: 600;
-  color: var(--accent);
-  margin-bottom: 0.5rem;
-  font-size: 1.1rem;
-}
-
-.card p, .card li {
-  font-size: 0.9rem;
-  color: var(--text-dim);
-  margin-bottom: 0.4rem;
-}
-
-.card p:last-child, .card li:last-child { margin-bottom: 0; }
-
-.card ul {
-  list-style: none;
-  padding: 0;
-}
-
-.card ul li::before {
-  content: '>';
-  color: var(--accent);
-  margin-right: 0.5rem;
-}
-
-/* Footer */
-.footer {
-  padding: 3rem 0;
-  border-top: 1px solid var(--border);
-  text-align: center;
-}
-
-.footer p {
-  font-size: 0.85rem;
-  color: var(--text-dim);
-  max-width: 60ch;
-  margin: 0 auto;
-  line-height: 1.8;
-}
-
-.footer .proof {
-  color: var(--amber);
-  font-weight: 600;
-}
-
-/* Responsive */
-@media (max-width: 600px) {
-  .container { padding: 0 1rem; }
-  section { padding: 2.5rem 0; }
-  .stats { grid-template-columns: repeat(2, 1fr); }
-}
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
+<canvas id="particleCanvas"></canvas>
+
+<script>
+const canvas = document.getElementById('particleCanvas');
+const ctx = canvas.getContext('2d');
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+class Particle {
+  constructor() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.size = Math.random() * 2 + 1;
+    this.speedX = Math.random() * 1 - 0.5;
+    this.speedY = Math.random() * 1 - 0.5;
+  }
+  update() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+    if (this.x > canvas.width) this.x = 0;
+    if (this.x < 0) this.x = canvas.width;
+    if (this.y > canvas.height) this.y = 0;
+    if (this.y < 0) this.y = canvas.height;
+  }
+  draw() {
+    ctx.fillStyle = 'rgba(74, 158, 110, 0.5)';
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+const particles = [];
+for (let i = 0; i < 50; i++) {
+  particles.push(new Particle());
+}
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    p.update();
+    p.draw();
+  });
+
+  // Draw connections between close particles
+  const connectionThreshold = 150; // pixels - distance threshold for particle connections
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      if (distance < connectionThreshold) {
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(74, 158, 110, 0.4)';
+        ctx.lineWidth = 1;
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+
+  requestAnimationFrame(animate);
+}
+
+animate();
+
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+</script>
 
 <div class="container">
 
@@ -401,6 +194,12 @@ section h2 {
   <!-- Footer -->
   <footer class="footer">
     <p>This website was generated by <span class="proof">ornith:9b</span>, running through an agentic coding harness — not hand-coded or templated. The same person who built this site also built the AI harness capable of building it. This page is a demonstration artifact for that harness, not just a portfolio.</p>
+
+    <div class="contact-text">
+      <span class="contact-sparkle"></span>
+      <span class="contact-label">Email: </span>
+      <span class="contact-value">REPLACE_WITH_EMAIL</span>
+    </div>
   </footer>
 
 </div>
