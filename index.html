@@ -278,11 +278,22 @@ let idx = 0;
 setInterval(() => {
   idx = (idx + 1) % statuses.length;
   const el = document.getElementById('statusText');
-  el.style.opacity = '0';
-  setTimeout(() => {
-    el.textContent = 'status: ' + statuses[idx];
-    el.style.opacity = '1';
-  }, 150);
+  const fullText = 'status: ' + statuses[idx];
+      el.textContent = '';
+      el.style.opacity = '1';
+      let charIdx = 0;
+
+  function typeOut() {
+    if (charIdx < fullText.length) {
+      el.textContent += fullText[charIdx];
+      charIdx++;
+      setTimeout(typeOut, 100);
+    } else {
+      el.style.opacity = '1';
+    }
+  }
+
+  setTimeout(typeOut, 150);
 }, 3000);
 </script>
 
