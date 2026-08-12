@@ -53,17 +53,6 @@ body::before {
   pointer-events: none;
 }
 
-/* Particle canvas */
-#particles-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 1;
-}
-
 /* Scrollbar */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
@@ -310,6 +299,12 @@ section h2 {
   border: 1px solid var(--border);
   border-radius: 4px;
   background: var(--bg-card);
+  transition: border-color 0.3s, transform 0.2s;
+}
+
+.footer .contact-text:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
 }
 
 .footer .contact-text::before {
@@ -319,6 +314,7 @@ section h2 {
   border-radius: 4px;
   background: radial-gradient(circle, rgba(74, 158, 110, 0.15) 0%, transparent 70%);
   animation: contact-glow 3s ease-in-out infinite;
+  pointer-events: none;
 }
 
 @keyframes contact-glow {
@@ -328,81 +324,58 @@ section h2 {
 
 .footer .contact-sparkle {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.footer .contact-sparkle::before {
-  content: '';
-  position: absolute;
-  width: 6px;
-  height: 6px;
+  width: 3px;
+  height: 3px;
   background: var(--accent);
   border-radius: 50%;
   opacity: 0;
-  animation: sparkle-flicker 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.footer .contact-sparkle:nth-child(1) {
+  top: 10%;
+  left: 8%;
+  animation: sparkle-flicker 3.5s ease-in-out infinite;
+  animation-delay: 0s;
+}
+
+.footer .contact-sparkle:nth-child(2) {
+  top: 70%;
+  left: 22%;
+  width: 4px;
+  height: 4px;
+  animation: sparkle-flicker 4.2s ease-in-out infinite;
+  animation-delay: 0.8s;
+}
+
+.footer .contact-sparkle:nth-child(3) {
+  top: 20%;
+  left: 55%;
+  width: 2px;
+  height: 2px;
+  animation: sparkle-flicker 3.8s ease-in-out infinite;
+  animation-delay: 1.6s;
+}
+
+.footer .contact-sparkle:nth-child(4) {
+  top: 65%;
+  left: 78%;
+  animation: sparkle-flicker 4.6s ease-in-out infinite;
+  animation-delay: 2.4s;
+}
+
+.footer .contact-sparkle:nth-child(5) {
+  top: 40%;
+  left: 92%;
+  width: 4px;
+  height: 4px;
+  animation: sparkle-flicker 3.2s ease-in-out infinite;
+  animation-delay: 3.1s;
 }
 
 @keyframes sparkle-flicker {
   0%, 100% { opacity: 0; transform: scale(0.5); }
-  50% { opacity: 0.8; transform: scale(1.5); }
-}
-
-/* Contact glow */
-.footer .contact-text {
-  position: relative;
-  display: inline-block;
-  color: var(--text);
-  font-size: 0.85rem;
-  margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background: var(--bg-card);
-}
-
-.footer .contact-text::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: 4px;
-  background: radial-gradient(circle, rgba(74, 158, 110, 0.15) 0%, transparent 70%);
-  animation: contact-glow 3s ease-in-out infinite;
-}
-
-@keyframes contact-glow {
-  0%, 100% { opacity: 0.4; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.1); }
-}
-
-.footer .contact-sparkle {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.footer .contact-sparkle::before {
-  content: '';
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  background: var(--accent);
-  border-radius: 50%;
-  opacity: 0;
-  animation: sparkle-flicker 4s ease-in-out infinite;
-}
-
-@keyframes sparkle-flicker {
-  0%, 100% { opacity: 0; transform: scale(0.5); }
-  50% { opacity: 0.8; transform: scale(1.5); }
+  50% { opacity: 0.9; transform: scale(1.6); }
 }
 
 /* Responsive */
