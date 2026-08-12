@@ -322,6 +322,30 @@ section h2 {
   50% { opacity: 0.8; transform: scale(1.1); }
 }
 
+.footer .contact-text a {
+  color: var(--accent);
+  text-decoration: none;
+  font-family: inherit;
+  font-size: inherit;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.footer .contact-text a:visited {
+  color: var(--accent);
+}
+
+.footer .contact-text a:hover,
+.footer .contact-text a:focus-visible {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+.footer .contact-text a:focus-visible {
+  outline: 1px dashed var(--accent);
+  outline-offset: 3px;
+}
+
 .footer .contact-sparkle {
   position: absolute;
   background: var(--accent);

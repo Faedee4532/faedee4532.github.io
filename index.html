@@ -1,301 +1,317 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fady — Portfolio</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%230a0e0a%22/><text x=%2250%22 y=%2268%22 font-family=%22monospace%22 font-size=%2260%22 font-weight=%22bold%22 fill=%22%234a9e6e%22 text-anchor=%22middle%22 stroke=%22%23111814%22 stroke-width=%224%22>Ⓕ</text></svg>">
-<meta name="description" content="Portfolio of Fady — cybersecurity student, red-team focused, cross-disciplinary builder. Exploit chain writeups, CTF work, and personal projects in Python, embedded systems, and more.">
-<meta property="og:title" content="Fady — Portfolio">
-<meta property="og:description" content="Cybersecurity student · Red-team focused · Cross-disciplinary builder — exploit chains, CTF writeups, and personal projects">
-<meta property="og:type" content="website">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fady — Portfolio</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%230a0e0a%22/><text x=%2250%22 y=%2268%22 font-family=%22monospace%22 font-size=%2260%22 font-weight=%22bold%22 fill=%22%234a9e6e%22 text-anchor=%22middle%22 stroke=%22%23111814%22 stroke-width=%224%22>Ⓕ</text></svg>">
+    <meta name="description" content="Portfolio of Fady — cybersecurity student, red-team focused, cross-disciplinary builder. Exploit chain writeups, CTF work, and personal projects in Python, embedded systems, and more.">
+    <meta property="og:title" content="Fady — Portfolio">
+    <meta property="og:description" content="Cybersecurity student · Red-team focused · Cross-disciplinary builder — exploit chains, CTF writeups, and personal projects">
+    <meta property="og:type" content="website">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<canvas id="particleCanvas"></canvas>
+    <canvas id="particleCanvas"></canvas>
 
-<script>
-// Contact details - placeholder values to be replaced by site owner
-const CONTACT_EMAIL = "carolinewmigalla@gmail.com";
-const CONTACT_LABEL = "Email:";
+    <script>
+        // Contact details - placeholder values to be replaced by site owner
+        const CONTACT_EMAIL = "carolinewmigalla@gmail.com";
+        const CONTACT_LABEL = "Email:";
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('contactValue').textContent = CONTACT_EMAIL;
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('contactValue').textContent = CONTACT_EMAIL;
 
-  const contactBox = document.getElementById('contactBox');
-  const SPARKLE_COUNT = 8;
-  let sparkleEls = [];
+            const SPARKLE_COUNT = 8;
 
-  function createSparkles() {
-    sparkleEls.forEach(el => el.remove());
-    sparkleEls = [];
-    for (let i = 0; i < SPARKLE_COUNT; i++) {
-      const el = document.createElement('span');
-      el.className = 'contact-sparkle';
-      contactBox.appendChild(el);
-      sparkleEls.push(el);
-    }
-  }
+            // Applies the sparkle effect to a single box, independent of any others.
+            function initSparkleBox(box) {
+                let sparkleEls = [];
 
-  function randomizeSparkle(el) {
-    const boxWidth = contactBox.offsetWidth;
-    const boxHeight = contactBox.offsetHeight;
-    if (boxWidth === 0 || boxHeight === 0) return;
+                function createSparkles() {
+                    sparkleEls.forEach(el => el.remove());
+                    sparkleEls = [];
+                    for (let i = 0; i < SPARKLE_COUNT; i++) {
+                        const el = document.createElement('span');
+                        el.className = 'contact-sparkle';
+                        box.appendChild(el);
+                        sparkleEls.push(el);
+                    }
+                }
 
-    const size = 2 + Math.random() * 3;
-    const left = Math.random() * (boxWidth - size);
-    const top = Math.random() * (boxHeight - size);
-    const duration = 2.8 + Math.random() * 2;
-    const delay = Math.random() * duration;
+                function randomizeSparkle(el) {
+                    const boxWidth = box.offsetWidth;
+                    const boxHeight = box.offsetHeight;
+                    if (boxWidth === 0 || boxHeight === 0) return;
 
-    el.style.width = size + 'px';
-    el.style.height = size + 'px';
-    el.style.left = left + 'px';
-    el.style.top = top + 'px';
-    el.style.animationDuration = duration + 's';
-    el.style.animationDelay = delay + 's';
-  }
+                    const size = 2 + Math.random() * 3;
+                    const left = Math.random() * (boxWidth - size);
+                    const top = Math.random() * (boxHeight - size);
+                    const duration = 2.8 + Math.random() * 2;
+                    const delay = Math.random() * duration;
 
-  function randomizeAllSparkles() {
-    sparkleEls.forEach(randomizeSparkle);
-  }
+                    el.style.width = size + 'px';
+                    el.style.height = size + 'px';
+                    el.style.left = left + 'px';
+                    el.style.top = top + 'px';
+                    el.style.animationDuration = duration + 's';
+                    el.style.animationDelay = delay + 's';
+                }
 
-  createSparkles();
-  randomizeAllSparkles();
+                function randomizeAllSparkles() {
+                    sparkleEls.forEach(randomizeSparkle);
+                }
 
-  let resizeTimeout;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(randomizeAllSparkles, 150);
-  });
+                createSparkles();
+                randomizeAllSparkles();
 
-  // No periodic re-render — sparkles animate continuously via CSS
-});
+                return randomizeAllSparkles;
+            }
 
-const canvas = document.getElementById('particleCanvas');
-const ctx = canvas.getContext('2d');
+            // Apply sparkles to every contact box on the page, each with its own
+            // independent set of sparkle elements.
+            const boxes = document.querySelectorAll('.contact-box');
+            const resizers = Array.from(boxes).map(initSparkleBox);
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    resizers.forEach(fn => fn());
+                }, 150);
+            });
 
-class Particle {
-  constructor() {
-    this.x = Math.random() * canvas.width;
-    this.y = Math.random() * canvas.height;
-    this.size = Math.random() * 2 + 1;
-    this.speedX = Math.random() * 1 - 0.5;
-    this.speedY = Math.random() * 1 - 0.5;
-  }
-  update() {
-    this.x += this.speedX;
-    this.y += this.speedY;
-    if (this.x > canvas.width) this.x = 0;
-    if (this.x < 0) this.x = canvas.width;
-    if (this.y > canvas.height) this.y = 0;
-    if (this.y < 0) this.y = canvas.height;
-  }
-  draw() {
-    ctx.fillStyle = 'rgba(74, 158, 110, 0.5)';
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-    ctx.fill();
-  }
-}
+            // No periodic re-render — sparkles animate continuously via CSS
+        });
 
-const particles = [];
-for (let i = 0; i < 50; i++) {
-  particles.push(new Particle());
-}
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
 
-function animate() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  particles.forEach(p => {
-    p.update();
-    p.draw();
-  });
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-  // Draw connections between close particles
-  const connectionThreshold = 150; // pixels - distance threshold for particle connections
-  for (let i = 0; i < particles.length; i++) {
-    for (let j = i + 1; j < particles.length; j++) {
-      const dx = particles[i].x - particles[j].x;
-      const dy = particles[i].y - particles[j].y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      if (distance < connectionThreshold) {
-        ctx.beginPath();
-        ctx.strokeStyle = 'rgba(74, 158, 110, 0.4)';
-        ctx.lineWidth = 1;
-        ctx.moveTo(particles[i].x, particles[i].y);
-        ctx.lineTo(particles[j].x, particles[j].y);
-        ctx.stroke();
-      }
-    }
-  }
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(74, 158, 110, 0.5)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
 
-  requestAnimationFrame(animate);
-}
+        const particles = [];
+        for (let i = 0; i < 50; i++) {
+            particles.push(new Particle());
+        }
 
-animate();
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
 
-window.addEventListener('resize', () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-});
-</script>
+            // Draw connections between close particles
+            const connectionThreshold = 150; // pixels - distance threshold for particle connections
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < connectionThreshold) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = 'rgba(74, 158, 110, 0.4)';
+                        ctx.lineWidth = 1;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
 
-<div class="container">
+            requestAnimationFrame(animate);
+        }
 
-  <!-- Hero -->
-  <section class="hero">
-    <h1>Fady</h1>
-    <p class="subtitle">Cybersecurity student · Red-team focused · Cross-disciplinary builder</p>
-    <div class="status-indicator">
-      <span class="status-dot"></span>
-      <span class="status-text" id="statusText">status: online</span>
-      <span class="status-cursor"></span>
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+
+    <div class="container">
+
+        <!-- Hero -->
+        <section class="hero">
+            <h1>Fady</h1>
+            <p class="subtitle">Cybersecurity student · Red-team focused · Cross-disciplinary builder</p>
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span class="status-text" id="statusText">status: online</span>
+                <span class="status-cursor"></span>
+            </div>
+        </section>
+
+        <!-- About -->
+        <section id="about">
+            <h2>01 — Identity</h2>
+            <div class="about">
+                <p>Currently interning at a security company under a mentor, doing formal penetration testing report work. Building toward red team roles with OSCP-level proficiency.</p>
+                <p>Cross-disciplinary background: game development, backend APIs, Discord bots, a personal AI project, embedded/IoT hardware.</p>
+            </div>
+        </section>
+
+        <!-- Stats -->
+        <section id="stats">
+            <h2>02 — Stats</h2>
+            <div class="stats">
+                <div class="stat"><span class="number">30</span><span class="label">boxes rooted</span></div>
+                <div class="stat"><span class="number">4</span><span class="label">HTB machines</span></div>
+                <div class="stat"><span class="number">26</span><span class="label">THM rooms</span></div>
+                <div class="stat"><span class="number">1</span><span class="label">formal report</span></div>
+            </div>
+        </section>
+
+        <!-- Exploit Chains -->
+        <section id="exploits">
+            <h2>03 — Exploit Chains & CTF Work</h2>
+            <div class="cards">
+                <div class="card">
+                    <h3>HTB — Nexus (Linux, Easy)</h3>
+                    <p>vhost enumeration → Gitea repo recon (leaked creds in git history) → Krayin CRM CVE-2026-38526 TinyMCE RCE → www-data shell → SSH as jones via credential reuse → root via git mktree/commit-tree path traversal, exploiting an unsanitized os.path.join() in a root-run systemd timer script. Git blocks / and .. at the porcelain layer, so the traversal needed 5 levels of .. built through nested tree-object construction.</p>
+                </div>
+                <div class="card">
+                    <h3>HTB — Orion (Linux)</h3>
+                    <p>CraftCMS CVE-2025-32432 RCE → credential reuse → internal Telnet CVE → privesc to root. The only box documented to client-deliverable report standard.</p>
+                </div>
+                <div class="card">
+                    <h3>THM — Athena (Linux)</h3>
+                    <p>Command injection via %0a bypass → pspy64 cron enumeration → privesc via LKM rootkit triggered by kill -57 to a hidden syscall handler.</p>
+                </div>
+                <div class="card">
+                    <h3>THM — Valley (Linux)</h3>
+                    <p>pcapng credential extraction → UPX binary unpacking → privesc via Python library hijack in cron.</p>
+                </div>
+                <div class="card">
+                    <h3>THM — madness (Linux)</h3>
+                    <p>Magic-byte forensics on a mislabeled file → steghide extraction → privesc via SUID screen 4.5.0 CVE.</p>
+                </div>
+                <div class="card">
+                    <h3>21 more THM rooms</h3>
+                    <p>Ghostcat (CVE-2020-1938), Hydra SSH brute-forcing, IDOR/XSS/LFI chains, cookie forgery + /etc/hosts poisoning, Tomcat WAR deployment, directory-vs-file sudo permission abuse. Named rooms include Brooklyn Nine Nine, Library, Ignite, Thompson, tomghost, Overpass, Dreaming, and LAFB 2026 series rooms.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- What I've Built -->
+        <section id="built">
+            <h2>04 — What I've Built</h2>
+            <div class="cards">
+                <div class="card">
+                    <h3>ornith_cli</h3>
+                    <p>A custom Ollama-based agentic coding harness running on a locally hosted model (ornith:9b, Qwen3.5-9B hybrid), with a two-role orchestrator (ornith_cli_overseer.py) that splits large development goals into sequenced sub-prompts handled by separate Overseer and Agent roles. A tkinter GUI variant is designed and pending merge. Stack: Python, Ollama, Qwen3.5-9B hybrid, tkinter.</p>
+                </div>
+                <div class="card">
+                    <h3>Local inference hardware evaluation</h3>
+                    <p>Benchmarked a larger 27B-class model (Qwen3.6-27B) at IQ3 quantization across two consumer GPUs (GTX 1650 Ti laptop, GTX 1650 desktop), identified RAM bandwidth as the hard bottleneck (~1.1 tok/s), and made the call to stay on the smaller daily-driver model rather than chase a size the hardware couldn't serve — then correctly scoped the next upgrade around VRAM (8GB+), not RAM. Stack: llama.cpp, quantization, GPU benchmarking.</p>
+                </div>
+                <div class="card">
+                    <h3>ESP32 environmental monitor</h3>
+                    <p>Temperature and humidity monitor built on an ESP32-WROOM, reading from an AM2302/DHT22 sensor and displaying live data on an I2C SSD1306 OLED (address 0x3C). Built end-to-end as a gift for a mentor, with a custom enclosure planned. Stack: ESP32, I2C, DHT22, SSD1306.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Infra & Systems -->
+        <section id="infra">
+            <h2>05 — Infra & Systems</h2>
+            <div class="cards">
+                <div class="card">
+                    <h3>Arch Linux, from scratch, twice</h3>
+                    <p>First on VirtualBox to work out the process, then a full bare-metal install on a Dell Inspiron 3558 replacing Windows 10, running KDE Plasma via archinstall. Debugged UUID precision issues in bootloader config, disabled Secure Boot for USB install, cleaned up NVRAM boot entries left behind from cloned VMs.</p>
+                </div>
+                <div class="card">
+                    <h3>Enumeration & recon discipline</h3>
+                    <p>Consistent methodology across boxes: fingerprint the server stack before touching a payload. Reinforced repeatedly across TryHackMe's speed-focused rooms, carried into every real engagement since.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final Year Project -->
+        <section id="project">
+            <h2>06 — Final-Year Project (in progress)</h2>
+            <div class="card">
+                <h3>Linux process monitor & threat scorer</h3>
+                <p>Combines SHA-256 hash checks against MalwareBazaar, VirusTotal API lookups, and eBPF-based kernel behavioral monitoring via BCC/libbpf, feeding into a weighted threat-scoring engine with optional Isolation Forest anomaly detection. Process data pulled by polling /proc with psutil, ELF features extracted with lief, presented through a CustomTkinter dashboard, packaged with PyInstaller. Deliberately scoped to Linux only, and deliberately avoids LLM-based runtime inference — at detection time, latency and resource cost matter more than marginal accuracy gain.</p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>This website was generated by <span class="proof">ornith:9b</span>, running through an agentic coding harness — not hand-coded or templated. The same person who built this site also built the AI harness capable of building it. This page is a demonstration artifact for that harness, not just a portfolio.</p>
+
+            <div class="contact-text contact-box">
+                <span class="contact-label">Email: </span>
+                <span class="contact-value" id="contactValue"></span>
+            </div>
+            <div class="contact-text contact-box">
+                <span class="contact-label">TryHackMe page: </span>
+                <a href="https://tryhackme.com/p/carolinewmigalla" target="_blank" rel="noopener">Link!</a>
+            </div>
+        </footer>
+
     </div>
-  </section>
 
-  <!-- About -->
-  <section id="about">
-    <h2>01 — Identity</h2>
-    <div class="about">
-      <p>Currently interning at a security company under a mentor, doing formal penetration testing report work. Building toward red team roles with OSCP-level proficiency.</p>
-      <p>Cross-disciplinary background: game development, backend APIs, Discord bots, a personal AI project, embedded/IoT hardware.</p>
-    </div>
-  </section>
+    <!-- ASCII SIGNATURE GOES HERE
+      Paste your ASCII art signature below this comment.
+      This is a reserved marker for the site owner to insert their own
+      signature later. Do not remove or modify this comment block.
+    -->
 
-  <!-- Stats -->
-  <section id="stats">
-    <h2>02 — Stats</h2>
-    <div class="stats">
-      <div class="stat"><span class="number">30</span><span class="label">boxes rooted</span></div>
-      <div class="stat"><span class="number">4</span><span class="label">HTB machines</span></div>
-      <div class="stat"><span class="number">26</span><span class="label">THM rooms</span></div>
-      <div class="stat"><span class="number">1</span><span class="label">formal report</span></div>
-    </div>
-  </section>
+    <script>
+        const statuses = ['online', 'scanning', 'idle'];
+        let idx = 0;
 
-  <!-- Exploit Chains -->
-  <section id="exploits">
-    <h2>03 — Exploit Chains & CTF Work</h2>
-    <div class="cards">
-      <div class="card">
-        <h3>HTB — Nexus (Linux, Easy)</h3>
-        <p>vhost enumeration → Gitea repo recon (leaked creds in git history) → Krayin CRM CVE-2026-38526 TinyMCE RCE → www-data shell → SSH as jones via credential reuse → root via git mktree/commit-tree path traversal, exploiting an unsanitized os.path.join() in a root-run systemd timer script. Git blocks / and .. at the porcelain layer, so the traversal needed 5 levels of .. built through nested tree-object construction.</p>
-      </div>
-      <div class="card">
-        <h3>HTB — Orion (Linux)</h3>
-        <p>CraftCMS CVE-2025-32432 RCE → credential reuse → internal Telnet CVE → privesc to root. The only box documented to client-deliverable report standard.</p>
-      </div>
-      <div class="card">
-        <h3>THM — Athena (Linux)</h3>
-        <p>Command injection via %0a bypass → pspy64 cron enumeration → privesc via LKM rootkit triggered by kill -57 to a hidden syscall handler.</p>
-      </div>
-      <div class="card">
-        <h3>THM — Valley (Linux)</h3>
-        <p>pcapng credential extraction → UPX binary unpacking → privesc via Python library hijack in cron.</p>
-      </div>
-      <div class="card">
-        <h3>THM — madness (Linux)</h3>
-        <p>Magic-byte forensics on a mislabeled file → steghide extraction → privesc via SUID screen 4.5.0 CVE.</p>
-      </div>
-      <div class="card">
-        <h3>21 more THM rooms</h3>
-        <p>Ghostcat (CVE-2020-1938), Hydra SSH brute-forcing, IDOR/XSS/LFI chains, cookie forgery + /etc/hosts poisoning, Tomcat WAR deployment, directory-vs-file sudo permission abuse. Named rooms include Brooklyn Nine Nine, Library, Ignite, Thompson, tomghost, Overpass, Dreaming, and LAFB 2026 series rooms.</p>
-      </div>
-    </div>
-  </section>
+        setInterval(() => {
+            idx = (idx + 1) % statuses.length;
+            const el = document.getElementById('statusText');
+            const fullText = 'status: ' + statuses[idx];
+            el.textContent = '';
+            el.style.opacity = '1';
+            let charIdx = 0;
 
-  <!-- What I've Built -->
-  <section id="built">
-    <h2>04 — What I've Built</h2>
-    <div class="cards">
-      <div class="card">
-        <h3>ornith_cli</h3>
-        <p>A custom Ollama-based agentic coding harness running on a locally hosted model (ornith:9b, Qwen3.5-9B hybrid), with a two-role orchestrator (ornith_cli_overseer.py) that splits large development goals into sequenced sub-prompts handled by separate Overseer and Agent roles. A tkinter GUI variant is designed and pending merge. Stack: Python, Ollama, Qwen3.5-9B hybrid, tkinter.</p>
-      </div>
-      <div class="card">
-        <h3>Local inference hardware evaluation</h3>
-        <p>Benchmarked a larger 27B-class model (Qwen3.6-27B) at IQ3 quantization across two consumer GPUs (GTX 1650 Ti laptop, GTX 1650 desktop), identified RAM bandwidth as the hard bottleneck (~1.1 tok/s), and made the call to stay on the smaller daily-driver model rather than chase a size the hardware couldn't serve — then correctly scoped the next upgrade around VRAM (8GB+), not RAM. Stack: llama.cpp, quantization, GPU benchmarking.</p>
-      </div>
-      <div class="card">
-        <h3>ESP32 environmental monitor</h3>
-        <p>Temperature and humidity monitor built on an ESP32-WROOM, reading from an AM2302/DHT22 sensor and displaying live data on an I2C SSD1306 OLED (address 0x3C). Built end-to-end as a gift for a mentor, with a custom enclosure planned. Stack: ESP32, I2C, DHT22, SSD1306.</p>
-      </div>
-    </div>
-  </section>
+            function typeOut() {
+                if (charIdx < fullText.length) {
+                    el.textContent += fullText[charIdx];
+                    charIdx++;
+                    setTimeout(typeOut, 100);
+                } else {
+                    el.style.opacity = '1';
+                }
+            }
 
-  <!-- Infra & Systems -->
-  <section id="infra">
-    <h2>05 — Infra & Systems</h2>
-    <div class="cards">
-      <div class="card">
-        <h3>Arch Linux, from scratch, twice</h3>
-        <p>First on VirtualBox to work out the process, then a full bare-metal install on a Dell Inspiron 3558 replacing Windows 10, running KDE Plasma via archinstall. Debugged UUID precision issues in bootloader config, disabled Secure Boot for USB install, cleaned up NVRAM boot entries left behind from cloned VMs.</p>
-      </div>
-      <div class="card">
-        <h3>Enumeration & recon discipline</h3>
-        <p>Consistent methodology across boxes: fingerprint the server stack before touching a payload. Reinforced repeatedly across TryHackMe's speed-focused rooms, carried into every real engagement since.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Final Year Project -->
-  <section id="project">
-    <h2>06 — Final-Year Project (in progress)</h2>
-    <div class="card">
-      <h3>Linux process monitor & threat scorer</h3>
-      <p>Combines SHA-256 hash checks against MalwareBazaar, VirusTotal API lookups, and eBPF-based kernel behavioral monitoring via BCC/libbpf, feeding into a weighted threat-scoring engine with optional Isolation Forest anomaly detection. Process data pulled by polling /proc with psutil, ELF features extracted with lief, presented through a CustomTkinter dashboard, packaged with PyInstaller. Deliberately scoped to Linux only, and deliberately avoids LLM-based runtime inference — at detection time, latency and resource cost matter more than marginal accuracy gain.</p>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <p>This website was generated by <span class="proof">ornith:9b</span>, running through an agentic coding harness — not hand-coded or templated. The same person who built this site also built the AI harness capable of building it. This page is a demonstration artifact for that harness, not just a portfolio.</p>
-
-    <div class="contact-text" id="contactBox">
-        <span class="contact-label">Email: </span>
-        <span class="contact-value" id="contactValue"></span>
-    </div>
-  </footer>
-
-</div>
-
-<!-- ASCII SIGNATURE GOES HERE
-  Paste your ASCII art signature below this comment.
-  This is a reserved marker for the site owner to insert their own
-  signature later. Do not remove or modify this comment block.
--->
-
-<script>
-const statuses = ['online', 'scanning', 'idle'];
-let idx = 0;
-
-setInterval(() => {
-  idx = (idx + 1) % statuses.length;
-  const el = document.getElementById('statusText');
-  const fullText = 'status: ' + statuses[idx];
-      el.textContent = '';
-      el.style.opacity = '1';
-      let charIdx = 0;
-
-  function typeOut() {
-    if (charIdx < fullText.length) {
-      el.textContent += fullText[charIdx];
-      charIdx++;
-      setTimeout(typeOut, 100);
-    } else {
-      el.style.opacity = '1';
-    }
-  }
-
-  setTimeout(typeOut, 150);
-}, 3000);
-</script>
+            setTimeout(typeOut, 150);
+        }, 5000);
+    </script>
 
 </body>
 </html>
