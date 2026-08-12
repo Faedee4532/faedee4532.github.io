@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     resizeTimeout = setTimeout(randomizeAllSparkles, 150);
   });
 
-  setInterval(randomizeAllSparkles, 6000);
+  // No periodic re-render — sparkles animate continuously via CSS
 });
 
 const canvas = document.getElementById('particleCanvas');
