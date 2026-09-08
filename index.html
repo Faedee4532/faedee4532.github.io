@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fady — Portfolio</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%230a0e0a%22/><text x=%2250%22 y=%2268%22 font-family=%22monospace%22 font-size=%2260%22 font-weight=%22bold%22 fill=%22%234a9e6e%22 text-anchor=%22middle%22 stroke=%22%23111814%22 stroke-width=%224%22>Ⓕ</text></svg>">
+    <link rel="icon" href="favicon.svg">
     <meta name="description" content="Portfolio of Fady — cybersecurity student, red-team focused, cross-disciplinary builder. Exploit chain writeups, CTF work, and personal projects in Python, embedded systems, and more.">
     <meta property="og:title" content="Fady — Portfolio">
     <meta property="og:description" content="Cybersecurity student · Red-team focused · Cross-disciplinary builder — exploit chains, CTF writeups, and personal projects">
@@ -17,146 +17,9 @@
 <body>
     <canvas id="particleCanvas"></canvas>
 
-    <script>
-        // Contact details - placeholder values to be replaced by site owner
-        const CONTACT_EMAIL = "carolinewmigalla@gmail.com";
-        const CONTACT_LABEL = "Email:";
-
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('contactValue').textContent = CONTACT_EMAIL;
-
-            const SPARKLE_COUNT = 8;
-
-            // Applies the sparkle effect to a single box, independent of any others.
-            function initSparkleBox(box) {
-                let sparkleEls = [];
-
-                function createSparkles() {
-                    sparkleEls.forEach(el => el.remove());
-                    sparkleEls = [];
-                    for (let i = 0; i < SPARKLE_COUNT; i++) {
-                        const el = document.createElement('span');
-                        el.className = 'contact-sparkle';
-                        box.appendChild(el);
-                        sparkleEls.push(el);
-                    }
-                }
-
-                function randomizeSparkle(el) {
-                    const boxWidth = box.offsetWidth;
-                    const boxHeight = box.offsetHeight;
-                    if (boxWidth === 0 || boxHeight === 0) return;
-
-                    const size = 2 + Math.random() * 3;
-                    const left = Math.random() * (boxWidth - size);
-                    const top = Math.random() * (boxHeight - size);
-                    const duration = 2.8 + Math.random() * 2;
-                    const delay = Math.random() * duration;
-
-                    el.style.width = size + 'px';
-                    el.style.height = size + 'px';
-                    el.style.left = left + 'px';
-                    el.style.top = top + 'px';
-                    el.style.animationDuration = duration + 's';
-                    el.style.animationDelay = delay + 's';
-                }
-
-                function randomizeAllSparkles() {
-                    sparkleEls.forEach(randomizeSparkle);
-                }
-
-                createSparkles();
-                randomizeAllSparkles();
-
-                return randomizeAllSparkles;
-            }
-
-            // Apply sparkles to every contact box on the page, each with its own
-            // independent set of sparkle elements.
-            const boxes = document.querySelectorAll('.contact-box');
-            const resizers = Array.from(boxes).map(initSparkleBox);
-
-            let resizeTimeout;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(() => {
-                    resizers.forEach(fn => fn());
-                }, 150);
-            });
-
-            // No periodic re-render — sparkles animate continuously via CSS
-        });
-
-        const canvas = document.getElementById('particleCanvas');
-        const ctx = canvas.getContext('2d');
-
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 1;
-                this.speedX = Math.random() * 1 - 0.5;
-                this.speedY = Math.random() * 1 - 0.5;
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x > canvas.width) this.x = 0;
-                if (this.x < 0) this.x = canvas.width;
-                if (this.y > canvas.height) this.y = 0;
-                if (this.y < 0) this.y = canvas.height;
-            }
-            draw() {
-                ctx.fillStyle = 'rgba(74, 158, 110, 0.5)';
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        const particles = [];
-        for (let i = 0; i < 50; i++) {
-            particles.push(new Particle());
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
-
-            // Draw connections between close particles
-            const connectionThreshold = 150; // pixels - distance threshold for particle connections
-            for (let i = 0; i < particles.length; i++) {
-                for (let j = i + 1; j < particles.length; j++) {
-                    const dx = particles[i].x - particles[j].x;
-                    const dy = particles[i].y - particles[j].y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    if (distance < connectionThreshold) {
-                        ctx.beginPath();
-                        ctx.strokeStyle = 'rgba(74, 158, 110, 0.4)';
-                        ctx.lineWidth = 1;
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.stroke();
-                    }
-                }
-            }
-
-            requestAnimationFrame(animate);
-        }
-
-        animate();
-
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
-    </script>
+    <script src="skills.js"></script>
+    <script src="rooms.js"></script>
+    <script src="shared.js"></script>
 
     <div class="container">
 
@@ -198,22 +61,27 @@
                 <div class="card">
                     <h3>HTB — Nexus (Linux, Easy)</h3>
                     <p>vhost enumeration → Gitea repo recon (leaked creds in git history) → Krayin CRM CVE-2026-38526 TinyMCE RCE → www-data shell → SSH as jones via credential reuse → root via git mktree/commit-tree path traversal, exploiting an unsanitized os.path.join() in a root-run systemd timer script. Git blocks / and .. at the porcelain layer, so the traversal needed 5 levels of .. built through nested tree-object construction.</p>
+                    <a href="nexus.html" target="_blank" rel="noopener" class="nexus-link"> View Further Details </a>
                 </div>
                 <div class="card">
                     <h3>HTB — Orion (Linux)</h3>
                     <p>CraftCMS CVE-2025-32432 RCE → credential reuse → internal Telnet CVE → privesc to root. The only box documented to client-deliverable report standard.</p>
+                    <a href="orion.html" target="_blank" rel="noopener" class="nexus-link"> View Further Details </a>
                 </div>
                 <div class="card">
                     <h3>THM — Athena (Linux)</h3>
                     <p>Command injection via %0a bypass → pspy64 cron enumeration → privesc via LKM rootkit triggered by kill -57 to a hidden syscall handler.</p>
+                    <a href="athena.html" target="_blank" rel="noopener" class="nexus-link"> View Further Details </a>
                 </div>
                 <div class="card">
                     <h3>THM — Valley (Linux)</h3>
                     <p>pcapng credential extraction → UPX binary unpacking → privesc via Python library hijack in cron.</p>
+                    <a href="valley.html" target="_blank" rel="noopener" class="nexus-link"> View Further Details </a>
                 </div>
                 <div class="card">
                     <h3>THM — madness (Linux)</h3>
                     <p>Magic-byte forensics on a mislabeled file → steghide extraction → privesc via SUID screen 4.5.0 CVE.</p>
+                    <a href="madness.html" target="_blank" rel="noopener" class="nexus-link"> View Further Details </a>
                 </div>
                 <div class="card">
                     <h3>21 more THM rooms</h3>
@@ -265,6 +133,15 @@
             </div>
         </section>
 
+        <!-- Skills -->
+        <section id="skills">
+            <h2>07 — Skills &amp; Tooling</h2>
+            <p>A collection of the techniques, tools, and stacks applied across the rooms and projects below — each skill put to work on real boxes and builds.</p>
+            <div class="skills-section">
+                <div id="skillsProfile"></div>
+            </div>
+        </section>
+
         <!-- Footer -->
         <footer class="footer">
             <p>This website was generated by <span class="proof">ornith:9b</span>, running through an agentic coding harness — not hand-coded or templated. The same person who built this site also built the AI harness capable of building it. This page is a demonstration artifact for that harness, not just a portfolio.</p>
@@ -281,40 +158,19 @@
 
     </div>
 
-	<!-- ASCII SIGNATURE (I'm showing off at this point, oh well hello inspect-element user :D)
-		______   ___       ____     __  __
-	   / ____/  /   |     / __ \    \ \/ /
-	  / /_     / /| |    / / / /     \  / 
-	 / __/    / ___ |   / /_/ /      / /  
-	/_/      /_/  |_|  /_____/      /_/   
-		
-	-->
+    <!-- ASCII SIGNATURE (I'm showing off at this point, oh well, hello inspect-element user :D)
+            ______   ___       ____     __  __
+           / ____/  /   |     / __ \    \ \/ /
+          / /_     / /| |    / / / /     \  /
+         / __/    / ___ |   / /_/ /      / /
+        /_/      /_/  |_|  /_____/      /_/
 
+    -->
     <script>
-        const statuses = ['online', 'scanning', 'idle'];
-        let idx = 0;
-
-        setInterval(() => {
-            idx = (idx + 1) % statuses.length;
-            const el = document.getElementById('statusText');
-            const fullText = 'status: ' + statuses[idx];
-            el.textContent = '';
-            el.style.opacity = '1';
-            let charIdx = 0;
-
-            function typeOut() {
-                if (charIdx < fullText.length) {
-                    el.textContent += fullText[charIdx];
-                    charIdx++;
-                    setTimeout(typeOut, 100);
-                } else {
-                    el.style.opacity = '1';
-                }
-            }
-
-            setTimeout(typeOut, 150);
-        }, 5000);
+    document.addEventListener('DOMContentLoaded', function () {
+        var el = document.getElementById('skillsProfile');
+        if (el) renderSkillsProfile(el);
+    });
     </script>
-
 </body>
 </html>

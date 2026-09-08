@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fady — Nexus</title>
+    <meta name="description" content="Nexus (HTB, Easy/Linux) — vhost enumeration → Gitea recon → Krayin CRM CVE-2026-38526 TinyMCE RCE → www-data → SSH as jones → root via git mktree/commit-tree path traversal.">
+    <meta property="og:title" content="Fady — Nexus">
+    <meta property="og:description" content="Nexus (HTB Easy/Linux) — Gitea recon → Krayin CRM RCE → credential reuse → git mktree root path traversal.">
+    <meta property="og:type" content="website">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="container">
+        <section class="hero">
+            <h1>Nexus</h1>
+            <p class="subtitle">vhost enumeration → Gitea repo recon (leaked creds in git history) → Krayin CRM CVE-2026-38526 TinyMCE RCE → www-data shell → SSH as jones via credential reuse → root via git mktree/commit-tree path traversal</p>
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span class="status-text" id="statusText">status: online</span>
+                <span class="status-cursor"></span>
+            </div>
+            <a href="index.html" class="nexus-link back-nav">&larr; Portfolio</a>
+        </section>
+
+        <section class="content">
+            <h2>Nexus — Easy/Linux Writeup</h2>
+            <p><strong>Executive Summary.</strong> An Easy-difficulty Ubuntu 24.04 box masquerading as a corporate energy utility. The chain opens with a vhost hunt that exposes a self-hosted Gitea instance, whose public repository history leaks a plaintext DB password. That key unlocks a Krayin CRM authenticated file-upload RCE (CVE-2026-38526), and a credential-reuse habit turns the web-tier shell into a live SSH user. Root falls through a root-run Gitea "template sync" systemd timer and an unsanitized <code>os.path.join()</code>, where a git <code>mktree</code>/<code>commit-tree</code> traversal rewrites the porcelain path rules to drop a key into <code>/root/.ssh/authorized_keys</code>.</p>
+
+            <h3>Phase 01 — Reconnaissance</h3>
+            <p>An aggressive <code>nmap -A -Pn</code> scan surfaces only two doors: port 22 (OpenSSH 9.6p1) and port 80 (nginx 1.24.0), which redirects to <code>nexus.htb</code>. The redirect is the first tell — name-based hosting means more than one site lives on the IP. A subdomain/vhost fuzz (<code>ffuf</code>) against <code>nexus.htb</code> splits the host into two vhosts: <code>git.nexus.htb</code> (a Gitea instance) and <code>billing.nexus.htb</code> (the Krayin CRM).</p>
+            <ul>
+                <li>The corporate landing page ("Nexus Energy Authority") leaks an internal contact on a careers posting: <code>j.matthew@nexus.htb</code> — a usable username later.</li>
+                <li><code>git.nexus.htb</code> runs Gitea 1.26.0 with <code>require_signin=False</code>, so every public repo is browsable without an account.</li>
+            </ul>
+
+            <h3>Phase 02 — Initial Access</h3>
+            <p>Under the Gitea <code>admin</code> account a public repo, <code>admin/krayin-docker-setup</code>, holds the Docker Compose for the billing CRM. Browsing its commit history reveals the <code>.env</code> file committed in plaintext and later redacted — the old DB password survived in the diff: <code>N27xh!!2ucY04</code>. Combined with the leaked email, that is a valid CRM credential pair.</p>
+            <p>Login succeeds against <code>billing.nexus.htb/admin</code>. The dashboard reports Krayin CRM 2.2.0. A version check points to CVE-2026-38526 — an authenticated, unrestricted file-upload RCE in the TinyMCE media endpoint (<code>/admin/tinymce/upload</code>), CVSS 9.9 Critical, with a public PoC on Exploit-DB (52629).</p>
+            <ul>
+                <li>Upload a pentestmonkey PHP reverse shell by renaming <code>shell.php</code> through the multipart form and forwarding it in Burp.</li>
+                <li>The response reveals the stored location, e.g. <code>/storage/tinymce/&lt;hash&gt;.php</code>; curl it to catch a <code>www-data</code> shell on a listener.</li>
+                <li>Upgrade to a PTY (<code>python3 -c 'import pty;pty.spawn("/bin/bash")'</code>).</li>
+            </ul>
+
+            <h3>Phase 03 — User Access</h3>
+            <p>As <code>www-data</code>, read the live app config directly: <code>cat .env</code> exposes a fresh DB password (<code>y27xb3ha!!74GbR</code>) — rotated from the git leak but still the same reuse pattern. Enumerating <code>/etc/passwd</code> shows <code>jones</code> with a login shell. A credential-reuse login (<code>ssh jones@nexus.htb</code>) with the DB password lands a stable shell, and <code>user.txt</code> is read.</p>
+            <p>Root then falls through the Gitea template-sync mechanism. Two paths were documented:</p>
+            <ul>
+                <li><strong>Automated.</strong> A bash script chains the Gitea API token grab, template repo creation, tree construction, and push in one run.</li>
+                <li><strong>Manual plumbing.</strong> The precise, room-tied trick. The template-sync script reads <code>git ls-tree -r HEAD</code> of any <code>template=true</code> repo and joins each filepath with <code>os.path.join(stage_path, filepath)</code> without sanitizing it.</li>
+            </ul>
+            <p>Git's porcelain layer refuses paths containing <code>/</code> or empty components, so a raw absolute path can't be committed normally. The solution builds <code>../../../../../root/.ssh/authorized_keys</code> through five nested <code>mktree</code> tree objects, then commits and pushes with <code>commit-tree</code>/<code>update-ref</code> so the timer picks the crafted path up within a minute and writes the attacker's SSH key as root.</p>
+
+            <h3>Findings &amp; CVEs</h3>
+            <ul>
+                <li><span class="cvss-badge sev-critical">9.9 · Critical</span> <strong>CVE-2026-38526</strong> — Krayin CRM TinyMCE unrestricted file-upload RCE (CVSS 9.9, Critical). Authenticated PHP upload → <code>www-data</code>.</li>
+                <li><strong>Git history cred leak</strong> — <code>.env</code> committed plaintext in a public Gitea repo.</li>
+                <li><strong>Credential reuse</strong> — DB password reused for <code>jones</code> SSH.</li>
+                <li><strong>os.path.join() traversal</strong> — unsanitized filepath in a root-run systemd timer, escalated with git <code>mktree</code>/<code>commit-tree</code> plumbing.</li>
+            </ul>
+
+            <h3>Skills Covered</h3>
+            <div class="skills-section">
+                <div id="roomSkills"></div>
+            </div>
+
+            <div class="image-placeholder"><!-- personal screenshots go here --></div>
+        </section>
+
+    </div>
+
+    <script src="skills.js"></script>
+    <script src="rooms.js"></script>
+    <script src="shared.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var el = document.getElementById('roomSkills');
+        if (el) {
+            var room = window.ROOMS ? window.ROOMS.find(r => r.id === 'nexus') : null;
+            renderRoomSkills(el, room ? room.skills : []);
+        }
+    });
+    </script>
+</body>
+</html>

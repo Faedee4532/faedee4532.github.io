@@ -268,6 +268,34 @@ section h2 {
   margin-right: 0.5rem;
 }
 
+/* Writeup content (subpages) — spacing between paragraphs, phases, and lists */
+section.content p {
+  margin-bottom: 1rem;
+}
+section.content p:last-child {
+  margin-bottom: 0;
+}
+section.content h3 {
+  margin: 1.75rem 0 0.75rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+section.content ul {
+  margin: 0.75rem 0 1rem;
+  padding-left: 1.25rem;
+}
+section.content ul li {
+  margin-bottom: 0.4rem;
+}
+section.content code {
+  background: var(--bg);
+  padding: 0.05rem 0.35rem;
+  border-radius: 4px;
+  color: var(--accent);
+  font-size: 0.85em;
+}
+
 /* Footer */
 .footer {
   padding: 3rem 0;
@@ -346,6 +374,31 @@ section h2 {
   outline-offset: 3px;
 }
 
+/* Nexus link */
+.nexus-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-family: inherit;
+  font-size: inherit;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.nexus-link:visited {
+  color: var(--accent);
+}
+
+.nexus-link:hover,
+.nexus-link:focus-visible {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+.nexus-link:focus-visible {
+  outline: 1px dashed var(--accent);
+  outline-offset: 3px;
+}
+
 .footer .contact-sparkle {
   position: absolute;
   background: var(--accent);
@@ -358,8 +411,145 @@ section h2 {
 }
 
 @keyframes sparkle-flicker {
-  0%, 100% { opacity: 0; transform: scale(0.5); }
-  50% { opacity: 0.9; transform: scale(1.6); }
+  0% { opacity: 0.15; transform: scale(0.7) rotate(0deg); }
+  50% { opacity: 0.5; transform: scale(1.25) rotate(360deg); }
+  100% { opacity: 0.15; transform: scale(0.7) rotate(720deg); }
+}
+
+/* CVSS severity badges */
+.cvss-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--sev-color, var(--accent));
+  color: var(--sev-color, var(--accent));
+  background: rgba(200, 214, 205, 0.06);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.cvss-badge::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 999px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--sev-color, var(--accent)) 22%, transparent) 0%, transparent 70%);
+  animation: contact-glow 3s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+.cvss-badge strong, .cvss-badge span { position: relative; z-index: 1; }
+
+.sev-critical { --sev-color: #ff6d6b; }
+.sev-high { --sev-color: #ffaa5b; }
+.sev-medium { --sev-color: #f0c94c; }
+.sev-low { --sev-color: #7ee0a8; }
+.sev-none { --sev-color: var(--text-dim); }
+
+/* Skills profile */
+.skills-section { margin-top: 1.5rem; }
+.skills-category {
+  margin: 2rem 0 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--accent);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.4rem;
+}
+.skills-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.skill-chip {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-card);
+  color: #ffffff;
+  font-size: 0.85rem;
+  -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.85);
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.9);
+  isolation: isolate;
+  transition: border-color 0.25s, transform 0.2s, box-shadow 0.25s;
+  /* seeded per-page rainbow tuning (set in skills.js) */
+  --rainbow-offset: 0deg;
+  --rainbow-speed: 8s;
+  --pulse-speed: 3.5s;
+}
+/* Rotating soft rainbow — backmost layer, diffused, bleeds to the rounded edge */
+.skill-chip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--rainbow-offset),
+    #ff2a2a, #ff9a1a, #ffd21a, #2ad15a, #18e0ff, #2a6bff, #7a2aff, #ff1ad0, #ff2a2a
+  );
+  filter: blur(8px);
+  mix-blend-mode: screen;
+  opacity: 0.5;
+  z-index: 0;
+  pointer-events: none;
+  animation: rainbow-spin var(--rainbow-speed) linear infinite;
+}
+/* Pulsing breathing layer — sits over the rainbow, behind the text, so it can breathe */
+.skill-chip::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--rainbow-offset),
+    #ff2a2a, #ff9a1a, #ffd21a, #2ad15a, #18e0ff, #2a6bff, #7a2aff, #ff1ad0, #ff2a2a
+  );
+  filter: blur(8px);
+  mix-blend-mode: screen;
+  opacity: 0.25;
+  z-index: 1;
+  pointer-events: none;
+  animation: rainbow-pulse var(--pulse-speed) ease-in-out infinite;
+}
+.skill-chip:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 0 14px var(--accent-glow);
+}
+.skill-chip > .skill-sparkle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+  animation-name: sparkle-flicker;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes rainbow-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rainbow-pulse {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.75; }
+}
+
+/* Back-to-nav link (reuses index nexus-link style) */
+.back-nav {
+  display: inline-block;
+  margin-top: 1rem;
 }
 
 /* Responsive */

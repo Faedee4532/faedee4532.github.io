@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fady — Orion</title>
+    <meta name="description" content="Orion (HTB, Easy/Linux) — CraftCMS CVE-2025-32432 RCE → credential reuse → internal Telnet CVE → privesc to root. Documented to client-deliverable report standard.">
+    <meta property="og:title" content="Fady — Orion">
+    <meta property="og:description" content="Orion (HTB Easy/Linux) — CraftCMS RCE → credential reuse → Telnet CVE → root. Report-standard writeup.">
+    <meta property="og:type" content="website">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="container">
+        <section class="hero">
+            <h1>Orion</h1>
+            <p class="subtitle">CraftCMS CVE-2025-32432 RCE → credential reuse → internal Telnet CVE → privesc to root</p>
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span class="status-text" id="statusText">status: online</span>
+                <span class="status-cursor"></span>
+            </div>
+            <a href="index.html" class="nexus-link back-nav">&larr; Portfolio</a>
+        </section>
+
+        <section class="content">
+            <h2>Orion — Easy/Linux Writeup</h2>
+            <p><strong>Executive Summary.</strong> An Easy Linux box running a CraftCMS-backed site for a fictional telecom ("Orion Telecom"). The foothold is a known CVE in the CMS's image-transform endpoint (CVE-2025-32432), reached through a CSRF validation bypass; a misconfigured <code>.env</code> exposes the database, and a cracked, reused password gives SSH. Root comes from a legacy telnetd (CVE-2026-24061) authentication bypass on the loopback interface.</p>
+            <p>This machine was documented to client-deliverable report standard — findings, CVSS ratings, and a clean methodology — rather than as an informal note.</p>
+
+            <h3>Phase 01 — Reconnaissance</h3>
+            <p><code>nmap -sCV -oN</code> on the target returns two open services: port 22 (SSH) and port 80 (nginx 1.18.0), which redirects to <code>orion.htb</code>. Adding the host to <code>/etc/hosts</code> and fingerprinting the stack with Wappalyzer reveals the site is built on <strong>Craft CMS + Yii</strong>. A directory/endpoints fuzz (<code>ffuf</code>) surfaces <code>/admin</code> (redirects to <code>/admin/login</code>) and <code>/assets</code>. The login portal footprints Craft CMS 5.6.16.</p>
+
+            <h3>Phase 02 — Initial Access</h3>
+            <p>Craft CMS 5.6.16 is vulnerable to <strong>CVE-2025-32432</strong> — an authenticated RCE in the <code>assets/generate-transform</code> endpoint, which handles image transforms. A CSRF validation bypass lets an attacker stage a malicious PHP payload inside a temporary session file during the auth redirect; when the request is issued to the endpoint with a manipulated handle object, the framework deserializes the configuration without proper validation and executes arbitrary code.</p>
+            <ul>
+                <li>Publish the payload, then trigger the transform with a discovered asset ID (read from the response headers).</li>
+                <li>Fire the payload with <code>curl</code> or Burp to catch a <code>www-data</code> shell.</li>
+                <li>Upgrade to a PTY with <code>python3 -c 'import pty;pty.spawn("/bin/bash")'</code>.</li>
+            </ul>
+
+            <h3>Phase 03 — User Access</h3>
+            <p>Enumerate the Craft directory and read the environment file at <code>/var/www/html/craft/.env</code>. It stores MySQL credentials in plaintext: <code>CRAFT_DB_USER=root</code>, <code>CRAFT_DB_PASSWORD=SuperSecureCraft123Pass!</code>. Connect to the local MariaDB/MySQL (<code>mysql -u root -p</code>) and query the <code>users</code> table — the <code>adam</code> account carries a bcrypt hash (<code>$2y$13$...</code>). Crack it with Hashcat (<code>-m 3200</code>, rockyou), then log in via SSH as <code>adam</code> (credential reuse) to read <code>user.txt</code>.</p>
+
+            <h3>Phase 04 — Privilege Escalation</h3>
+            <p>Enumerate local listeners with <code>ss -lntp</code> and find port 23 open (a telnet server). Check the daemon version and locate CVE-2026-24061 in the GNU <code>inetutils</code> <code>telnetd</code>. The exploit abuses argument parsing: by setting <code>USER='-f root'</code> and running <code>telnet -a 127.0.0.1 23</code>, the client forwards authentication for <code>root</code> and the authentication bypass spawns a root shell on loopback.</p>
+            <ul>
+                <li><code>env USER='-f root' telnet -a 127.0.0.1 23</code></li>
+                <li>The <code>-a</code> flag enables automatic login, which reads the injected <code>USER</code> value as the forward target.</li>
+            </ul>
+
+            <h3>Findings &amp; CVEs</h3>
+            <ul>
+                <li><span class="cvss-badge sev-critical">10.0 · Critical</span> <strong>CVE-2025-32432</strong> — Craft CMS <code>generate-transform</code> RCE via CSRF bypass. Authenticated PHP upload → <code>www-data</code>.</li>
+                <li><strong>Plaintext DB creds</strong> in <code>.env</code> (root MariaDB user).</li>
+                <li><strong>Credential reuse</strong> — cracked bcrypt reused for <code>adam</code> SSH.</li>
+                <li><span class="cvss-badge sev-critical">9.8 · Critical</span> <strong>CVE-2026-24061</strong> — GNU inetutils telnetd authentication bypass → root.</li>
+            </ul>
+
+            <h3>Skills Covered</h3>
+            <div class="skills-section">
+                <div id="roomSkills"></div>
+            </div>
+
+            <div class="image-placeholder"><!-- personal screenshots go here --></div>
+        </section>
+
+    </div>
+
+    <script src="skills.js"></script>
+    <script src="rooms.js"></script>
+    <script src="shared.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var el = document.getElementById('roomSkills');
+        if (el) {
+            var room = window.ROOMS ? window.ROOMS.find(r => r.id === 'orion') : null;
+            renderRoomSkills(el, room ? room.skills : []);
+        }
+    });
+    </script>
+</body>
+</html>

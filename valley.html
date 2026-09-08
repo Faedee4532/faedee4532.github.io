@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fady — Valley</title>
+    <meta name="description" content="Valley (THM, Linux) — pcapng credential extraction → UPX binary unpacking → privesc via Python library hijack in cron.">
+    <meta property="og:title" content="Fady — Valley">
+    <meta property="og:description" content="Valley (THM Linux) — pcapng credential extraction → UPX binary unpacking → Python library hijack in cron.">
+    <meta property="og:type" content="website">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="container">
+        <section class="hero">
+            <h1>Valley</h1>
+            <p class="subtitle">pcapng credential extraction → UPX binary unpacking → privesc via Python library hijack in cron</p>
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span class="status-text" id="statusText">status: online</span>
+                <span class="status-cursor"></span>
+            </div>
+            <a href="index.html" class="nexus-link back-nav">&larr; Portfolio</a>
+        </section>
+
+        <section class="content">
+            <h2>Valley — Linux Writeup</h2>
+            <p><strong>Executive Summary.</strong> An Easy THM box with three doors: SSH (22), HTTP (80), and FTP on a non-standard port (37370). The path is a layered credential hunt: a JS-embedded dev login, reused over FTP, unlocks a <code>.pcapng</code> full of an HTTP POST that leaks a user's password. A UPX-packed authenticator binary on the host is unpacked and string-mined for a second MD5. Root comes from hijacking Python's <code>base64</code> module, which the root cron job imports every minute.</p>
+
+            <h3>Phase 01 — Reconnaissance</h3>
+            <p><code>rustscan</code>/<code>nmap -p-</code> reveals ports 22 (SSH), 80 (HTTP), and 37370 (FTP). The site is a thin static gallery that loads images from a <code>/static/</code> path. A two-digit fuzz (<code>ffuf</code> over <code>/static/FUZZ</code>) resolves <code>/static/00</code> to a dev login page for "Valley Photo Co."</p>
+            <p>The page source leaks hardcoded developer credentials in <code>dev.js</code>. The same creds work for the FTP service on 37370, where a handful of <code>.pcapng</code> files are downloaded with <code>mget</code>.</p>
+
+            <h3>Phase 02 — Initial Access</h3>
+            <p>Open the captures in Wireshark and filter on <code>http.request.method == POST</code>. One of the five POSTs carries plaintext form credentials in the TCP stream. Those credentials log in via SSH as <code>valleyDev</code> and <code>user.txt</code> is read.</p>
+
+            <h3>Phase 03 — User Access</h3>
+            <p>In <code>/home</code> there is a <code>valleyAuthenticator</code> binary that prompts for a username and password. Run <code>strings</code> — it ends with UPX markers, so the file is packed. Unpack with <code>upx -d</code>, then re-run <code>strings</code>: two MD5 hashes are embedded. Crack them offline (John/rockyou) to recover a second user's password, then <code>su valley</code>.</p>
+
+            <h3>Phase 04 — Privilege Escalation</h3>
+            <p>The root cron job (<code>/etc/crontab</code>) runs <code>/photos/schema/photosEncrypt.py</code> every minute; it imports the <code>base64</code> module to encode images. The script itself is root-owned and unwritable, but its imported <code>base64.py</code> (in <code>/usr/lib/python3.8</code>) is writable by the <code>valleyAdmin</code> group that <code>valley</code> belongs to.</p>
+            <p>Append a small payload to <code>base64.py</code> that the root job inherits:</p>
+            <ul>
+                <li><code>import os; os.system("chmod u+s /bin/bash")</code></li>
+                <li>Wait for the next cron run, then <code>ls -la /bin/bash</code> to confirm the SUID bit.</li>
+                <li>Spawn the root shell with <code>/bin/bash -p</code> (the <code>-p</code> preserves the effective UID so privileges aren't dropped).</li>
+            </ul>
+
+            <h3>Findings &amp; CVEs</h3>
+            <ul>
+                <li><strong>pcapng credential extraction</strong> — HTTP POST plaintext in a captured stream.</li>
+                <li><strong>UPX unpacking</strong> — <code>upx -d</code> reveals embedded MD5 hashes from a packed binary.</li>
+                <li><strong>Python library hijack</strong> — writable <code>base64.py</code> imported by the root cron job → SUID <code>bash</code>.</li>
+            </ul>
+
+            <h3>Skills Covered</h3>
+            <div class="skills-section">
+                <div id="roomSkills"></div>
+            </div>
+
+            <div class="image-placeholder"><!-- personal screenshots go here --></div>
+        </section>
+
+    </div>
+
+    <script src="skills.js"></script>
+    <script src="rooms.js"></script>
+    <script src="shared.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var el = document.getElementById('roomSkills');
+        if (el) {
+            var room = window.ROOMS ? window.ROOMS.find(r => r.id === 'valley') : null;
+            renderRoomSkills(el, room ? room.skills : []);
+        }
+    });
+    </script>
+</body>
+</html>

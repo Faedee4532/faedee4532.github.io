@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fady — Madness</title>
+    <meta name="description" content="Madness (THM, Linux) — magic-byte forensics on a mislabeled file → steghide extraction → privesc via SUID screen 4.5.0 CVE.">
+    <meta property="og:title" content="Fady — Madness">
+    <meta property="og:description" content="Madness (THM Linux) — magic-byte forensics → steghide extraction → SUID screen 4.5.0 privesc.">
+    <meta property="og:type" content="website">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="container">
+        <section class="hero">
+            <h1>Madness</h1>
+            <p class="subtitle">magic-byte forensics on a mislabeled file → steghide extraction → privesc via SUID screen 4.5.0 CVE</p>
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span class="status-text" id="statusText">status: online</span>
+                <span class="status-cursor"></span>
+            </div>
+            <a href="index.html" class="nexus-link back-nav">&larr; Portfolio</a>
+        </section>
+
+        <section class="content">
+            <h2>Madness — Linux Writeup</h2>
+            <p><strong>Executive Summary.</strong> An Easy THM CTF room (Mr. Robot themed). The entry is steganography and file forensics: a JPG that reports as plain data is really a PNG by its magic bytes, so its header is corrected to reveal a hidden directory. A numeric "secret" is brute-forced, and <code>steghide</code> pulls a username and password out of two images. Root comes from a SUID <code>screen-4.5.0</code> binary and its classic sudo/pty exploit.</p>
+
+            <h3>Phase 01 — Reconnaissance</h3>
+            <p><code>nmap</code> opens ports 22 (SSH) and 80 (Apache). The site shows the default Apache page; the HTML references an image that doesn't render. Download it and run <code>file</code> — despite the <code>.jpg</code> extension, its header says PNG. The file's magic bytes were simply mislabeled.</p>
+
+            <h3>Phase 02 — Steganography</h3>
+            <p>Correct the header (rebuild the JPEG signature with an online hex editor such as HexEd.it) and the image loads, revealing a hidden directory path. Visit it; it expects a <code>?secret=</code> value and a source hint says the answer is between 0–99. Brute-force the parameter with Burp Intruder and the correct value is <code>73</code>, which returns a code/password hint.</p>
+            <p>Use <code>steghide info</code> on the image to confirm a hidden file, extract <code>hidden.txt</code> with the same passphrase, and read the username. The same passphrase also pulls a <code>password.txt</code> from the banner image. The username was ROT13-encoded — decode it to get the real login.</p>
+
+            <h3>Phase 03 — User Access</h3>
+            <p>Log in via SSH (22) with the ROT13-decoded username and the steganographic password to read <code>user.txt</code>.</p>
+
+            <h3>Phase 04 — Privilege Escalation</h3>
+            <p>Enumerate SUID binaries with <code>find / -type f -perm -04000 -ls</code>. The standout is <code>/bin/screen-4.5.0</code> (and a <code>.old</code> copy). Its version maps to a known SUID-screen privilege-escalation exploit (searchsploit), which reuses a root-owned shell session. Run the exploit's helper <code>.sh</code> to attach as root and read <code>root.txt</code>.</p>
+            <ul>
+                <li><code>find / -type f -perm -04000 -ls</code> to surface SUID binaries.</li>
+                <li><code>screen-4.5.0</code> — a SUID copy of the GNU screen binary.</li>
+                <li>Classic session-reuse exploit → root.</li>
+            </ul>
+
+            <h3>Findings &amp; CVEs</h3>
+            <ul>
+                <li><strong>Magic-byte forensics</strong> — a PNG mislabeled as JPG; header repair reveals a hidden path.</li>
+                <li><strong>steghide</strong> — username and password extracted from two images using a brute-forced passphrase.</li>
+                <li><strong>SUID screen 4.5.0</strong> — session-reuse privesc.</li>
+            </ul>
+
+            <h3>Skills Covered</h3>
+            <div class="skills-section">
+                <div id="roomSkills"></div>
+            </div>
+
+            <div class="image-placeholder"><!-- personal screenshots go here --></div>
+        </section>
+
+    </div>
+
+    <script src="skills.js"></script>
+    <script src="rooms.js"></script>
+    <script src="shared.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var el = document.getElementById('roomSkills');
+        if (el) {
+            var room = window.ROOMS ? window.ROOMS.find(r => r.id === 'madness') : null;
+            renderRoomSkills(el, room ? room.skills : []);
+        }
+    });
+    </script>
+</body>
+</html>

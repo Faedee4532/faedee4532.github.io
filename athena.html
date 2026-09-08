@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fady — Athena</title>
+    <meta name="description" content="Athena (THM, Linux) — command injection via %0a bypass → pspy64 cron enumeration → privesc via LKM rootkit triggered by kill -57 to a hidden syscall handler.">
+    <meta property="og:title" content="Fady — Athena">
+    <meta property="og:description" content="Athena (THM Linux) — command injection → pspy cron enumeration → LKM rootkit kill -57 privesc.">
+    <meta property="og:type" content="website">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="container">
+        <section class="hero">
+            <h1>Athena</h1>
+            <p class="subtitle">Command injection via %0a bypass → pspy64 cron enumeration → privesc via LKM rootkit triggered by kill -57 to a hidden syscall handler</p>
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span class="status-text" id="statusText">status: online</span>
+                <span class="status-cursor"></span>
+            </div>
+            <a href="index.html" class="nexus-link back-nav">&larr; Portfolio</a>
+        </section>
+
+        <section class="content">
+            <h2>Athena — Linux Writeup</h2>
+            <p><strong>Executive Summary.</strong> A THM box (hostname ROUTERPANEL) exposing SSH, an Apache site, and Samba. A small "ping" utility at <code>/myrouterpanel</code> has an OS command injection that only accepts a newline (<code>%0a</code>) when the usual operators are blocked. A root cron job running <code>backup.sh</code> as the <code>athena</code> user is pinned down with <code>pspy64</code>, giving the user. Root falls through an <code>insmod</code> sudo shortcut to a custom LKM rootkit whose real signal number is 57, not the documented 64.</p>
+
+            <h3>Phase 01 — Reconnaissance</h3>
+            <p><code>nmap -sV -sC -A</code> opens ports 22 (SSH), 80 (Apache 2.4.41), 139/445 (Samba 4.6.2). The Apache site is a thin landing page. Samba allows an anonymous/null-session login; the public share holds <code>msg_for_administrator.txt</code>, which points to a new in-development ping system at <code>/myrouterpanel</code>.</p>
+            <p>The ping form accepts an IP; <code>;</code>, <code>|</code>, and <code>&</code> are filtered with an "Attempt hacking" response — but a URL-encoded newline (<code>%0a</code>) slips past and runs a follow-on command, confirming injectability.</p>
+
+            <h3>Phase 02 — Initial Access</h3>
+            <p>Capture the ping POST in Burp and feed it to <code>commix</code>, which confirms the <code>ip</code> parameter is injectable via the classic results-based technique. Request a pseudo-TTY shell and drop a reverse shell (netcat) as <code>www-data</code>.</p>
+            <ul>
+                <li>Simple test: <code>ip = 10.9.2.147%0aid</code></li>
+                <li>Reverse-shell payload (URL-encoded): download a shell, <code>chmod +x</code>, then execute it via the injected newline.</li>
+            </ul>
+
+            <h3>Phase 03 — User Access</h3>
+            <p>Upload and run <code>pspy64</code> to watch processes in real time. It reveals user <code>athena</code> (UID 1001) running <code>/bin/bash /usr/share/backup/backup.sh</code> on a schedule (<code>athena_backup.service</code>). Read the script: it backs up <code>/home/athena/notes/</code> with <code>zip</code> and is owned <code>www-data:athena</code>, so <code>www-data</code> can overwrite it.</p>
+            <p>Inject a reverse shell into <code>backup.sh</code>; within one cron run the user shell connects and <code>user.txt</code> is read.</p>
+
+            <h3>Phase 04 — Privilege Escalation</h3>
+            <p><code>sudo -l</code> shows athena may run, unattended, the root <code>/usr/sbin/insmod /mnt/.../secret/venom.ko</code>. The module is a custom LKM rootkit (author <code>m0nad</code>) — the same lineage as Diamorphine. The README claims signal 64 makes any process root, but that's a decoy.</p>
+            <p>Run <code>modinfo</code>, then decompile <code>venom.ko</code> in Ghidra and follow <code>hacked_Kill</code>: the success condition is <code>rax == 0x39</code>, i.e. decimal 57. The author hand-edited the module so the real trigger is <code>kill -57 &lt;pid&gt;</code> on any process — that fires the hidden syscall handler and grants root.</p>
+            <ul>
+                <li>Documented (wrong): <code>kill -64 6666</code></li>
+                <li>Correct (reverse-engineered): <code>kill -57 6666</code> → root</li>
+            </ul>
+
+            <h3>Findings &amp; CVEs</h3>
+            <ul>
+                <li><strong>OS Command Injection</strong> — <code>%0a</code> newline bypass around a small operator blocklist.</li>
+                <li><strong>Writable cron script</strong> — <code>backup.sh</code> owned by athena's group, run by the user.</li>
+                <li><strong>LKM rootkit (venom.ko)</strong> — <code>insmod</code> sudo shortcut; correct trigger signal reverse-engineered to 57.</li>
+            </ul>
+
+            <h3>Skills Covered</h3>
+            <div class="skills-section">
+                <div id="roomSkills"></div>
+            </div>
+
+            <div class="image-placeholder"><!-- personal screenshots go here --></div>
+        </section>
+
+    </div>
+
+    <script src="skills.js"></script>
+    <script src="rooms.js"></script>
+    <script src="shared.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var el = document.getElementById('roomSkills');
+        if (el) {
+            var room = window.ROOMS ? window.ROOMS.find(r => r.id === 'athena') : null;
+            renderRoomSkills(el, room ? room.skills : []);
+        }
+    });
+    </script>
+</body>
+</html>
