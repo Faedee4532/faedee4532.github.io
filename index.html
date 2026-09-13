@@ -16,12 +16,24 @@
 </head>
 <body>
     <canvas id="particleCanvas"></canvas>
+    <script>document.body.className = (localStorage.getItem('theme') || 'dark');</script>
+    <button id="themeToggle" class="theme-toggle" aria-label="Switch to light theme" title="Theme"></button>
 
     <script src="skills.js"></script>
     <script src="rooms.js"></script>
     <script src="shared.js"></script>
 
     <div class="container">
+        <div class="scroll-progress" id="sectionProgress"><div class="scroll-progress-fill"></div></div>
+        <nav class="section-nav" id="sectionNav" aria-label="Page sections">
+            <a href="#about">01 Identity</a>
+            <a href="#stats">02 Stats</a>
+            <a href="#exploits">03 Exploits</a>
+            <a href="#built">04 Built</a>
+            <a href="#infra">05 Infra</a>
+            <a href="#project">06 Project</a>
+            <a href="#skills">07 Skills</a>
+        </nav>
 
         <!-- Hero -->
         <section class="hero">
@@ -57,33 +69,37 @@
         <!-- Exploit Chains -->
         <section id="exploits">
             <h2>03 — Exploit Chains & CTF Work</h2>
+            <div class="search-box">
+                <input type="text" id="writeupSearch" placeholder="filter writeups… (name, difficulty, technique, CVE)" autocomplete="off">
+                <span class="search-count" id="writeupCount"></span>
+            </div>
             <div class="cards">
-                <div class="card">
+                <div class="card" data-search="HTB nexus linux easy vhost gitea krayin cve-2026-38526 tinymce rce www-data ssh jones credential reuse git mktree commit-tree path traversal systemd timer cron">
                     <h3>HTB — Nexus (Linux, Easy)</h3>
                     <p>vhost enumeration → Gitea repo recon (leaked creds in git history) → Krayin CRM CVE-2026-38526 TinyMCE RCE → www-data shell → SSH as jones via credential reuse → root via git mktree/commit-tree path traversal, exploiting an unsanitized os.path.join() in a root-run systemd timer script. Git blocks / and .. at the porcelain layer, so the traversal needed 5 levels of .. built through nested tree-object construction.</p>
                     <a href="nexus.html" target="_blank" rel="noopener" class="nexus-link"> View Further Details </a>
                 </div>
-                <div class="card">
+                <div class="card" data-search="HTB Orion HTB Orion Linux Easy CraftCMS CVE-2025-32432 RCE credential reuse telnet CVE-2026-24061 report mysql bcrypt hashcat login">
                     <h3>HTB — Orion (Linux)</h3>
                     <p>CraftCMS CVE-2025-32432 RCE → credential reuse → internal Telnet CVE → privesc to root. The only box documented to client-deliverable report standard.</p>
                     <a href="orion.html" target="_blank" rel="noopener" class="nexus-link"> View Further Details </a>
                 </div>
-                <div class="card">
+                <div class="card" data-search="THM athena linux easy command injection pspy cron LKM rootkit sudo insmod kill 57 ghidra samba apache router">
                     <h3>THM — Athena (Linux)</h3>
                     <p>Command injection via %0a bypass → pspy64 cron enumeration → privesc via LKM rootkit triggered by kill -57 to a hidden syscall handler.</p>
                     <a href="athena.html" target="_blank" rel="noopener" class="nexus-link"> View Further Details </a>
                 </div>
-                <div class="card">
+                <div class="card" data-search="THM valley linux easy pcapng upx python library hijack cron suid bash md5 john ftp ssh base64 dev">
                     <h3>THM — Valley (Linux)</h3>
                     <p>pcapng credential extraction → UPX binary unpacking → privesc via Python library hijack in cron.</p>
                     <a href="valley.html" target="_blank" rel="noopener" class="nexus-link"> View Further Details </a>
                 </div>
-                <div class="card">
+                <div class="card" data-search="THM madness linux easy magic byte steghide suid screen 4.5.0 CVE forensics jpg png rot13 mr robot">
                     <h3>THM — madness (Linux)</h3>
                     <p>Magic-byte forensics on a mislabeled file → steghide extraction → privesc via SUID screen 4.5.0 CVE.</p>
                     <a href="madness.html" target="_blank" rel="noopener" class="nexus-link"> View Further Details </a>
                 </div>
-                <div class="card">
+                <div class="card" data-search="THM rooms ghostcat hydra idor lfi cookie forgery tomcat war brooklyn nine library ignite thompson tomghost overpass dreaming lafb 2026 csrf">
                     <h3>21 more THM rooms</h3>
                     <p>Ghostcat (CVE-2020-1938), Hydra SSH brute-forcing, IDOR/XSS/LFI chains, cookie forgery + /etc/hosts poisoning, Tomcat WAR deployment, directory-vs-file sudo permission abuse. Named rooms include Brooklyn Nine Nine, Library, Ignite, Thompson, tomghost, Overpass, Dreaming, and LAFB 2026 series rooms.</p>
                 </div>
@@ -138,6 +154,10 @@
             <h2>07 — Skills &amp; Tooling</h2>
             <p>A collection of the techniques, tools, and stacks applied across the rooms and projects below — each skill put to work on real boxes and builds.</p>
             <div class="skills-section">
+                <div class="search-box skills-search">
+                    <input type="text" id="skillSearch" placeholder="filter skills… (e.g. ffuf, suid, python)" autocomplete="off">
+                    <span class="search-count" id="skillCount"></span>
+                </div>
                 <div id="skillsProfile"></div>
             </div>
         </section>
@@ -152,7 +172,7 @@
             </div>
             <div class="contact-text contact-box">
                 <span class="contact-label">TryHackMe page: </span>
-                <a href="https://tryhackme.com/p/faedee453" target="_blank" rel="noopener">Link!</a>
+                <a href="https://tryhackme.com/p/carolinewmigalla" target="_blank" rel="noopener">Link!</a>
             </div>
         </footer>
 

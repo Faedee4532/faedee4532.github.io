@@ -16,6 +16,8 @@
 </head>
 <body>
     <canvas id="particleCanvas"></canvas>
+    <script>document.body.className = (localStorage.getItem('theme') || 'dark');</script>
+    <button id="themeToggle" class="theme-toggle" aria-label="Switch to light theme" title="Theme"></button>
 
     <div class="container">
         <section class="hero">

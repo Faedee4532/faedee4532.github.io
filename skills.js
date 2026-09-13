@@ -49,6 +49,7 @@ window.SKILLS = [
     // Tooling
     { id: 'burp', label: 'Burp Suite', category: 'Tooling' },
     { id: 'msf', label: 'Metasploit', category: 'Tooling' },
+    { id: 'telnet', label: 'Telnet (Auth Bypass)', category: 'Tooling' },
     { id: 'ghidra', label: 'Ghidra', category: 'Tooling' },
     { id: 'commix', label: 'commix', category: 'Tooling' },
     { id: 'searchsploit', label: 'searchsploit', category: 'Tooling' },
@@ -156,6 +157,11 @@ function renderRoomSkills(container, ids) {
     if (!container) return;
     container.innerHTML = '';
     const set = new Set(ids || []);
+    const registered = new Set((window.SKILLS || []).map(s => s.id));
+    const missing = (ids || []).filter(id => !registered.has(id));
+    if (missing.length > 0) {
+        missing.forEach(id => console.warn(`[skills.js] Unknown skill id "${id}" referenced by a room; skipping.`));
+    }
     const chips = window.SKILLS.filter(s => set.has(s.id));
     const grid = document.createElement('div');
     grid.className = 'skills-grid';
